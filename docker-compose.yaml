@@ -1,0 +1,76 @@
+services:
+  # 🔹 Base de données MySQL
+  db-courrier-service:
+    image: mysql:8.0
+    container_name: db-courrier
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: devopsdb
+      MYSQL_USER: devops
+      MYSQL_PASSWORD: devopspass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - courrier-net
+
+  # 🔹 PhpMyAdmin
+  phpmyadmin-courrier-service:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-courrier
+    restart: always
+    depends_on:
+      - db-courrier-service                  # correspond au nom du service bd
+    ports:
+      - "8083:80"
+    environment:
+      PMA_HOST: db-courrier-service          # correspond au nom du service bd
+    networks:
+      - courrier-net
+
+
+  # 🔹 Backend Spring Boot
+  backend-service:
+    image: ${BACKEND_IMAGE}:${BACKEND_TAG}
+    container_name: backend-courrier
+    restart: always
+    ports:
+      - "8082:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-courrier-service:3306/devopsdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: devops
+      SPRING_DATASOURCE_PASSWORD: devopspass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      db-courrier-service:
+        condition: service_healthy
+    networks:
+      - courrier-net
+
+  # 🔹 Frontend Angular via Nginx
+  frontend-service:
+    image: ${FRONTEND_IMAGE}:${FRONTEND_TAG}
+    container_name: frontend-courrier
+    restart: always
+    ports:
+      - "4200:80"   # Angular écoute sur 4200 en local
+      # - "0.0.0.0:4200:80"  # Windows peut y accéder via host.docker.internal depuis un conteneur
+
+    depends_on:
+      - backend-service
+    networks:
+      - courrier-net
+
+volumes:
+  mysql_data:
+
+networks:
+  courrier-net:
+    driver: bridge

@@ -1,0 +1,78 @@
+pipeline {
+    // Définir l’agent Jenkins sur lequel s'exécute le pipeline
+    // agent any
+
+    agent {
+        label 'agent-windows'
+    }
+
+    tools {
+        // Charger la version de Maven configurée dans Jenkins au niveau de tools
+        maven 'Maven-3.9.6'
+    }
+
+    environment {
+        // Définir des variables d’environnement pour l’image Docker
+        DOCKERHUB_USER = "encvr1"
+        IMAGE_NAME     = "backend-courrier"
+        IMAGE_TAG      = "1.${BUILD_NUMBER}"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                // Récupérer le code source depuis le dépôt Git (SCM)
+                checkout scm
+            }
+        }
+
+        stage('Tests Unitaires') {
+            steps {
+                // Exécuter les tests unitaires
+                bat "mvn clean test"
+            }
+        }
+
+        stage('Tests Integration') {
+            steps {
+                // Exécuter les tests d’intégration
+                bat "mvn verify"
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Construire l'image Docker avec le tag complet DockerHub
+                    bat """
+                        docker build -t ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} .
+                    """
+                }
+            }
+        }
+
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                // Déployer les services avec Docker Compose en mode détaché
+                bat "docker-compose down || true"
+                bat "docker-compose up -d --build"
+            }
+        }
+    }
+
+    post {
+        success {
+            // Afficher un message si le pipeline réussit
+            echo " Déploiement réussi"
+        }
+        failure {
+            // Afficher un message si le pipeline échoue
+            echo " Le pipeline a échoué, vérifie les logs Jenkins."
+        }
+
+
+
+    }
+}
