@@ -1,5 +1,5 @@
 # ================================
-# Étape 1 : Build du projet avec Maven
+# Étape 1 : Build du projet avec Maven encvr
 # ================================
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
