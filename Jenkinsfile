@@ -89,3 +89,58 @@ pipeline {
         }
     }
 }
+ // 🔹 Analyse SonarQube Backend
+ stage('Analyse SonarQube Backend') {
+     steps {
+         dir('backend') {
+             script {
+                 withSonarQubeEnv('SonarQube') {
+                     bat """
+                         mvn clean verify -DskipTests sonar:sonar ^
+                             -Dsonar.projectKey=analyse-code-backend2 ^
+                             -Dsonar.projectName="analyse-code-backend" ^
+                             -Dsonar.host.url=http://localhost:9001 ^
+                             -Dsonar.token=%SONAR_AUTH_TOKEN%
+                     """
+                 }
+             }
+         }
+     }
+ }
+
+
+ // 🔹 Quality Gate Backend
+/*  stage('Quality Gate Backend') {
+     steps {
+         timeout(time: 30, unit: 'MINUTES') {
+             waitForQualityGate abortPipeline: true
+         }
+     }
+ } */
+
+
+ // 🔹 Analyse SonarQube Frontend
+ stage('Analyse SonarQube Frontend') {
+     steps {
+         dir('frontend') {
+             script {
+                 withSonarQubeEnv('SonarQube') {
+                     withCredentials([string(credentialsId: 'sonar-credentials', variable: 'SONAR_AUTH_TOKEN')]) {
+
+                         // 🔹 Récupère le chemin du scanner déclaré dans Jenkins Tools
+                         def scannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+
+                         bat """
+                             "${scannerHome}\\bin\\sonar-scanner.bat" ^
+                                 -Dsonar.projectKey=analyse-code-frontend ^
+                                 -Dsonar.projectName="analyse-code-frontend" ^
+                                 -Dsonar.sources=src ^
+                                 -Dsonar.host.url=http://localhost:9000 ^
+                                 -Dsonar.token=%SONAR_AUTH_TOKEN%
+                         """
+                     }
+                 }
+             }
+         }
+     }
+ }
