@@ -4,10 +4,10 @@ pipeline {
         label 'agent-windows'
     }
 
-   /*  tools {
+   tools {
         maven 'Maven-3.9.6'
-    } */
-
+    }
+0
     environment {
         // DockerHub
         DOCKERHUB_USER = "encvr1"
