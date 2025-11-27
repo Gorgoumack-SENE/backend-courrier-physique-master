@@ -97,7 +97,7 @@ pipeline {
                  withSonarQubeEnv('SonarQube') {
                      bat """
                          mvn clean verify -DskipTests sonar:sonar ^
-                             -Dsonar.projectKey=analyse-code-backend2 ^
+                             -Dsonar.projectKey=analyse-code-backend ^
                              -Dsonar.projectName="analyse-code-backend" ^
                              -Dsonar.host.url=http://localhost:9001 ^
                              -Dsonar.token=%SONAR_AUTH_TOKEN%
