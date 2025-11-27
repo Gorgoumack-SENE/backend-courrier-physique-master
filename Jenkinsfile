@@ -17,8 +17,8 @@ pipeline {
         FRONTEND_TAG   = "1.${BUILD_NUMBER}"
 
         // Frontend GitHub
-        FRONTEND_REPO_URL     = 'https://github.com/devopsencvr/frontend-courrier-physique.git'
-        FRONTEND_REPO_BRANCH  = 'master'
+        FRONTEND_REPO_URL     = 'https://github.com/Gorgoumack-SENE/frontend-courrier-physique-master.git'
+        FRONTEND_REPO_BRANCH  = 'main'
         FRONTEND_CREDENTIALS  = 'credential-id-github'
     }
 
