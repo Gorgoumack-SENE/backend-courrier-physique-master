@@ -48,47 +48,6 @@ pipeline {
             }
         }
 
-
-
-        /* =======================================================
-           5. DOCKER BUILDS
-        ======================================================== */
-        stage('Build Backend Docker Image') {
-            steps {
-                dir('backend') {
-                    bat "docker build -t %BACKEND_IMAGE%:%BACKEND_TAG% ."
-                }
-            }
-        }
-
-        stage('Build Frontend Docker Image') {
-            steps {
-                dir('frontend') {
-                    bat "docker build -t %FRONTEND_IMAGE%:%FRONTEND_TAG% ."
-                }
-            }
-        }
-
-        /* =======================================================
-           6. DEPLOY DOCKER COMPOSE
-        ======================================================== */
-        stage('Deploy with Docker Compose') {
-            steps {
-                bat "docker-compose down || true"
-                bat "docker-compose up -d --build"
-            }
-        }
-    }
-
-    post {
-        success {
-            echo "🚀 Déploiement réussi !"
-        }
-        failure {
-            echo "❌ Le pipeline a échoué, vérifie les logs Jenkins."
-        }
-    }
-}
  // 🔹 Analyse SonarQube Backend
  stage('Analyse SonarQube Backend') {
      steps {
@@ -144,3 +103,43 @@ pipeline {
          }
      }
  }
+
+        /* =======================================================
+           5. DOCKER BUILDS
+        ======================================================== */
+        stage('Build Backend Docker Image') {
+            steps {
+                dir('backend') {
+                    bat "docker build -t %BACKEND_IMAGE%:%BACKEND_TAG% ."
+                }
+            }
+        }
+
+        stage('Build Frontend Docker Image') {
+            steps {
+                dir('frontend') {
+                    bat "docker build -t %FRONTEND_IMAGE%:%FRONTEND_TAG% ."
+                }
+            }
+        }
+
+        /* =======================================================
+           6. DEPLOY DOCKER COMPOSE
+        ======================================================== */
+        stage('Deploy with Docker Compose') {
+            steps {
+                bat "docker-compose down || true"
+                bat "docker-compose up -d --build"
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "🚀 Déploiement réussi !"
+        }
+        failure {
+            echo "❌ Le pipeline a échoué, vérifie les logs Jenkins."
+        }
+    }
+}
