@@ -48,7 +48,26 @@ pipeline {
             }
         }
 
- // 🔹 Analyse SonarQube Backend
+
+        /* =======================================================
+           5. DOCKER BUILDS
+        ======================================================== */
+        stage('Build Backend Docker Image') {
+            steps {
+                dir('backend') {
+                    bat "docker build -t %BACKEND_IMAGE%:%BACKEND_TAG% ."
+                }
+            }
+        }
+
+        stage('Build Frontend Docker Image') {
+            steps {
+                dir('frontend') {
+                    bat "docker build -t %FRONTEND_IMAGE%:%FRONTEND_TAG% ."
+                }
+            }
+        }
+// 🔹 Analyse SonarQube Backend
  stage('Analyse SonarQube Backend') {
      steps {
          dir('backend') {
@@ -103,25 +122,6 @@ pipeline {
          }
      }
  }
-
-        /* =======================================================
-           5. DOCKER BUILDS
-        ======================================================== */
-        stage('Build Backend Docker Image') {
-            steps {
-                dir('backend') {
-                    bat "docker build -t %BACKEND_IMAGE%:%BACKEND_TAG% ."
-                }
-            }
-        }
-
-        stage('Build Frontend Docker Image') {
-            steps {
-                dir('frontend') {
-                    bat "docker build -t %FRONTEND_IMAGE%:%FRONTEND_TAG% ."
-                }
-            }
-        }
 
         /* =======================================================
            6. DEPLOY DOCKER COMPOSE
