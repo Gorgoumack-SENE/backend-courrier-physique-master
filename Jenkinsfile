@@ -113,7 +113,7 @@ pipeline {
                                  -Dsonar.projectKey=analyse-code-frontend ^
                                  -Dsonar.projectName="analyse-code-frontend" ^
                                  -Dsonar.sources=src ^
-                                 -Dsonar.host.url=http://localhost:9000 ^
+                                 -Dsonar.host.url=http://localhost:9001 ^
                                  -Dsonar.token=%SONAR_AUTH_TOKEN%
                          """
                      }
